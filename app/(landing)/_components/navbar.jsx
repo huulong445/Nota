@@ -3,10 +3,15 @@
 import UseScrollTop from "../../../hooks/useScrollTop";
 import { ModeToggle } from "@/components/mode-toggle";
 import Logo from "./logo";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/spinner";
 import { cn } from "@/lib/utils";
-// import Logo from "./logo";
+import { useConvexAuth } from "convex/react";
+import { SignInButton, UserButton } from "@clerk/clerk-react";
+import Link from "next/link";
 export default function Navbar() {
   const scrolled = UseScrollTop();
+  const { isAuthenticated, isLoading } = useConvexAuth();
   return (
     <div
       className={cn(
@@ -16,6 +21,31 @@ export default function Navbar() {
     >
       <Logo />
       <div className="md:ml-auto md:justify-end justify-between flex items-center gap-x-2">
+        {isLoading && <Spinner />}
+
+        {/* not logged in */}
+        {!isAuthenticated && !isLoading && (
+          <>
+            <SignInButton>
+              <Button size="sm">Sign in</Button>
+            </SignInButton>
+            {/* <SignInButton>
+              <Button size="sm">Get Nota free</Button>
+            </SignInButton> */}
+          </>
+        )}
+
+        {/* logged in */}
+
+        {isAuthenticated && !isLoading && (
+          <>
+            {/* <Button variant="ghost" size="sm" asChild>
+              <Link href="/documents">Enter Nota</Link>
+            </Button> */}
+            Welcome
+            <UserButton afterSwitchSessionUrl="/" />
+          </>
+        )}
         <ModeToggle />
       </div>
     </div>
