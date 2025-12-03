@@ -8,6 +8,10 @@ import { useMediaQuery } from "usehooks-ts";
 import { cn } from "@/lib/utils";
 import path from "path";
 
+import UserItem from "./user-item";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
 export default function Navigation() {
   const isMobile = useMediaQuery("(max-width:768px)");
   const pathName = usePathname(); // collapse the sidebar whenever clicking on a document
@@ -17,6 +21,8 @@ export default function Navigation() {
   const navbarRef = useRef(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapse, setIsCollapse] = useState(isMobile); // mobile = collapse
+
+  const documents = useQuery(api.documents.get);
 
   const resetWidth = useCallback(
     (resetSize) => {
@@ -120,10 +126,12 @@ export default function Navigation() {
 
         {/*  nav bar content */}
         <div>
-          <p>Actions items</p>
+          <UserItem />
         </div>
         <div className="mt-4">
-          <p>Document</p>
+          {documents?.map((document) => (
+            <p key={document._id}>{document.title}</p>
+          ))}
 
           {/* sidebar */}
           <div
