@@ -3,24 +3,42 @@
 import {
   ChevronLeft,
   MenuIcon,
+  Plus,
   PlusCircle,
   Search,
   Settings,
+  Trash,
+  Trash2,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { useParams, usePathname } from "next/navigation";
 import { ElementRef, useCallback, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
+import { useSearch } from "@/hooks/useSearch";
+import { useSettings } from "@/hooks/useSettings";
 
 import { cn } from "@/lib/utils";
 import path from "path";
 
-import UserItem from "./user-item";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import Item from "./item";
 
+import UserItem from "./user-item";
+import DocumentList from "./document-list";
+import { TrashBox } from "./trash-box";
+import { Navbar } from "./navbar";
+
 export default function Navigation() {
+  const settings = useSettings();
+  const search = useSearch();
+  const params = useParams();
   const isMobile = useMediaQuery("(max-width:768px)");
   const pathName = usePathname(); // collapse the sidebar whenever clicking on a document
 
@@ -30,7 +48,6 @@ export default function Navigation() {
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapse, setIsCollapse] = useState(isMobile); // mobile = collapse
 
-  const documents = useQuery(api.documents.get);
   const create = useMutation(api.documents.create);
 
   const resetWidth = useCallback(
@@ -125,7 +142,7 @@ export default function Navigation() {
       <aside
         ref={sidebarRef}
         className={cn(
-          "group/sidebar h-screen bg-gray-200 overflow-y-auto relative flex w-60 flex-col z-[99999]",
+          "group/sidebar h-screen bg-gray-200 dark:bg-gray-950 overflow-y-auto relative flex w-60 flex-col z-[99999]",
           isResetting && "transition-all ease-in-out duration-300",
           isMobile && "w-0"
         )}
@@ -146,23 +163,40 @@ export default function Navigation() {
         <div>
           <UserItem />
           <div className="cursor-pointer">
-            <Item label="Search" icon={Search} isSearch onClick={() => {}} />
-            <Item label="Settings" icon={Settings} onClick={() => {}} />
+            <Item
+              label="Search"
+              icon={Search}
+              isSearch
+              onClick={search.onOpen}
+            />
+            <Item label="Settings" icon={Settings} onClick={settings.onOpen} />
             <Item onClick={handleCreate} label="New page" icon={PlusCircle} />
           </div>
         </div>
         <div className="mt-4">
-          {documents?.map((document) => (
-            <p key={document._id}>{document.title}</p>
-          ))}
-
-          {/* sidebar */}
-          <div
-            onMouseDown={handleMouseDown}
-            onClick={() => resetWidth(240)}
-            className="opacity-0 group-hover/sidebar:opacity-100 transition cursor-ew-resize absolute h-full w-1 bg-primary/10 right-0 top-0"
-          />
+          <DocumentList />
+          <div className="cursor-pointer">
+            <Item onClick={handleCreate} icon={Plus} label="Add a page" />
+          </div>
+          <Popover>
+            <PopoverTrigger className="w-full mt-4">
+              <Item label="Trash" icon={Trash2} />
+            </PopoverTrigger>
+            <PopoverContent
+              className="p-0 w-72"
+              side={isMobile ? "bottom" : "right"}
+            >
+              <TrashBox />
+            </PopoverContent>
+          </Popover>
         </div>
+
+        {/* sidebar */}
+        <div
+          onMouseDown={handleMouseDown}
+          onClick={() => resetWidth(240)}
+          className="opacity-0 group-hover/sidebar:opacity-100 transition cursor-ew-resize absolute h-full w-1 bg-primary/10 right-0 top-0"
+        />
       </aside>
 
       <div
@@ -173,15 +207,22 @@ export default function Navigation() {
           isMobile && "left-0 w-full"
         )}
       >
-        <nav className="bg-transparent px-3 py-2 w-full">
-          {isCollapse && (
-            <MenuIcon
-              onClick={() => resetWidth(240)}
-              role="button"
-              className="h-6 w-6 text-muted-foreground"
-            />
-          )}
-        </nav>
+        {!!params.documentId ? (
+          <Navbar
+            isCollapsed={isCollapse}
+            onResetWidth={() => resetWidth(240)}
+          />
+        ) : (
+          <nav className="bg-transparent dark:bg-gray-950 px-3 py-2 w-full">
+            {isCollapse && (
+              <MenuIcon
+                onClick={() => resetWidth(240)}
+                role="button"
+                className="h-6 w-6 text-muted-foreground dark:text-gray-400"
+              />
+            )}
+          </nav>
+        )}
       </div>
     </>
   );

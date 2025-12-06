@@ -2,11 +2,11 @@
 
 import { useConvexAuth } from "convex/react";
 import { useConvex } from "convex/react";
-
-import { Spinner } from "@/components/spinner";
 import { redirect } from "next/navigation";
 
 import Navigation from "./_components/navigation";
+import { Spinner } from "@/components/spinner";
+import { SearchCommand } from "@/components/search-command";
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useConvexAuth();
   if (isLoading) {
@@ -22,7 +22,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="h-screen flex dark:bg-[#1f1f1f]">
       <Navigation />
-      <main className="flex-1 h-full overflow-y-auto flex">{children}</main>
+      <main className="flex-1 h-full overflow-y-auto flex">
+        <SearchCommand />
+        {children}
+      </main>
     </div>
   );
 };

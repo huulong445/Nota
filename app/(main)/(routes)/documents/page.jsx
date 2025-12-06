@@ -23,6 +23,7 @@ export default function DocumentPage() {
   return (
     <div className="h-full w-full flex flex-col items-center justify-center space-y-4">
       <Image
+        loading="eager"
         src="/empty.svg"
         height="300"
         width="300"
@@ -30,7 +31,8 @@ export default function DocumentPage() {
         className="dark:hidden"
       />
       <Image
-        src="/empty.svg"
+        loading="eager"
+        src="/empty-dark.svg"
         height="300"
         width="300"
         alt="Empty Dark"
