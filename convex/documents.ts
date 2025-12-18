@@ -222,7 +222,8 @@ export const getById = query({
     const document = await ctx.db.get(args.documentId);
 
     if (!document) {
-      throw new Error("Not found");
+      // throw new Error("Not found");
+      return null;
     }
 
     if (document.isPublished && !document.isArchived) {

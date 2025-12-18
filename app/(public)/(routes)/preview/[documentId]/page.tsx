@@ -31,7 +31,11 @@ export default function DocumentIdPage({ params }: DocumentIdPageProps) {
   });
 
   if (document === undefined) {
-    return <div>Loading...</div>;
+    return (
+      <div className="h-screen w-full flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
   }
 
   if (document === null) {
@@ -55,7 +59,7 @@ export default function DocumentIdPage({ params }: DocumentIdPageProps) {
   }
 
   return (
-    <div className="pb-40 w-full">
+    <div className="pb-40 h-screen w-full">
       <Cover preview url={document.coverImage} />
       <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
         <Toolbar preview initialData={document} />
