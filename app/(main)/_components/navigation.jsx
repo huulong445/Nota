@@ -213,7 +213,7 @@ export default function Navigation() {
             onResetWidth={() => resetWidth(240)}
           />
         ) : (
-          <nav className="bg-transparent dark:bg-gray-950 px-3 py-2 w-full">
+          <nav className="bg-transparent dark:bg-[#1f1f1f] px-3 py-2 w-full">
             {isCollapse && (
               <MenuIcon
                 onClick={() => resetWidth(240)}

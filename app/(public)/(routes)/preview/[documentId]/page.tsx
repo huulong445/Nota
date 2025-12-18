@@ -6,6 +6,9 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Toolbar } from "@/components/toolbar";
 import { Editor } from "@/components/editor";
 import { Cover } from "@/components/cover";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Logo from "@/app/(landing)/_components/logo";
 interface DocumentIdPageProps {
   params: Promise<{
     documentId: Id<"documents">; // params is now a promise and needs to be unwrapped with React.use()
@@ -13,6 +16,7 @@ interface DocumentIdPageProps {
 }
 
 export default function DocumentIdPage({ params }: DocumentIdPageProps) {
+  const router = useRouter();
   const { documentId } = use(params);
   const update = useMutation(api.documents.update);
   const onChange = (content: string) => {
@@ -31,7 +35,23 @@ export default function DocumentIdPage({ params }: DocumentIdPageProps) {
   }
 
   if (document === null) {
-    return <div>Not found</div>;
+    return (
+      <div className="h-screen w-full relative">
+        <div className="absolute top-6 ml-3">
+          <Logo />
+        </div>
+
+        <div className="h-full flex flex-col items-center justify-center space-y-4 px-4">
+          <h1 className="text-3xl font-bold text-center">
+            This page couldn&apos;t be found
+          </h1>
+          <p className="text-muted-foreground text-center max-w-md">
+            You may not have access, or it might have been deleted or moved.
+            Check the link and try again.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

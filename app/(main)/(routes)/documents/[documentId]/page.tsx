@@ -6,6 +6,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Toolbar } from "@/components/toolbar";
 import { Editor } from "@/components/editor";
 import { Cover } from "@/components/cover";
+
 interface DocumentIdPageProps {
   params: Promise<{
     documentId: Id<"documents">; // params is now a promise and needs to be unwrapped with React.use()
@@ -35,9 +36,9 @@ export default function DocumentIdPage({ params }: DocumentIdPageProps) {
   }
 
   return (
-    <div className="pb-40 w-full">
+    <div className="w-full">
       <Cover url={document.coverImage} />
-      <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
+      <div className="md:max-w-3xl lg:max-w-4xl mx-auto pb-[40vh]">
         <Toolbar initialData={document} />
         <Editor onChange={onChange} initialContent={document.content} />
       </div>

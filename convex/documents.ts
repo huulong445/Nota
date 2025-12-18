@@ -196,6 +196,7 @@ export const remove = mutation({
   },
 });
 
+// search
 export const getSearch = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -218,7 +219,6 @@ export const getSearch = query({
 export const getById = query({
   args: { documentId: v.id("documents") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
     const document = await ctx.db.get(args.documentId);
 
     if (!document) {
@@ -228,9 +228,10 @@ export const getById = query({
     if (document.isPublished && !document.isArchived) {
       return document;
     }
-
+    const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error("Not authenticated");
+      // throw new Error("Not authenticated");
+      return null;
     }
 
     const userId = identity.subject;
