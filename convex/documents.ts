@@ -89,6 +89,7 @@ export const create = mutation({
       userId,
       isArchived: false,
       isPublished: false,
+      modifiedTime: Date.now(),
     });
     return document;
   },
@@ -155,6 +156,7 @@ export const restore = mutation({
 
     const options: Partial<Doc<"documents">> = {
       isArchived: false,
+      modifiedTime: Date.now(),
     };
 
     if (existingDocument.parentDocument) {
@@ -207,7 +209,7 @@ export const getSearch = query({
     const userId = identity.subject;
     const documents = await ctx.db
       .query("documents")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .withIndex("by_user_modified", (q) => q.eq("userId", userId))
       .filter((q) => q.eq(q.field("isArchived"), false))
       .order("desc")
       .collect();
@@ -271,6 +273,7 @@ export const update = mutation({
     }
     const document = await ctx.db.patch(args.id, {
       ...rest,
+      modifiedTime: Date.now(),
     });
     return document;
   },
@@ -296,6 +299,7 @@ export const removeIcon = mutation({
     }
     const document = await ctx.db.patch(args.id, {
       icon: undefined,
+      modifiedTime: Date.now(),
     });
     return document;
   },
@@ -321,6 +325,7 @@ export const removeCoverImage = mutation({
     }
     const document = await ctx.db.patch(args.id, {
       coverImage: undefined,
+      modifiedTime: Date.now(),
     });
     return document;
   },

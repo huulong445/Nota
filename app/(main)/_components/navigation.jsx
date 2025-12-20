@@ -2,6 +2,7 @@
 
 import {
   ChevronLeft,
+  Home,
   MenuIcon,
   Plus,
   PlusCircle,
@@ -16,7 +17,7 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { ElementRef, useCallback, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { useSearch } from "@/hooks/useSearch";
@@ -36,6 +37,7 @@ import { TrashBox } from "./trash-box";
 import { Navbar } from "./navbar";
 
 export default function Navigation() {
+  const router = useRouter();
   const settings = useSettings();
   const search = useSearch();
   const params = useParams();
@@ -163,6 +165,11 @@ export default function Navigation() {
         <div>
           <UserItem />
           <div className="cursor-pointer">
+            <Item
+              label="Home"
+              icon={Home}
+              onClick={() => router.push("/home")}
+            />
             <Item
               label="Search"
               icon={Search}

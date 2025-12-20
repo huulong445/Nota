@@ -12,8 +12,13 @@ export default defineSchema({
     coverImage: v.optional(v.string()),
     icon: v.optional(v.string()),
     isPublished: v.boolean(),
+    // _creationTime: v.number(),
+    modifiedTime: v.optional(v.number()),
   })
     .index("by_user", ["userId"])
+    // .index("by_user_creation", ["userId", "_creationTime"]) // sort theo thời gian tạo
+    // .index("by_modified_time", ["modifiedTime"])
+    .index("by_user_modified", ["userId", "modifiedTime"]) // sort theo thời gian chỉnh sửa + user
     .index("by_user_parent", ["userId", "parentDocument"]),
   templates: defineTable({
     title: v.string(),
