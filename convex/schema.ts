@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+// tạo bảng trong convex dtb
 export default defineSchema({
   documents: defineTable({
     title: v.string(),
@@ -14,4 +15,16 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_parent", ["userId", "parentDocument"]),
+  templates: defineTable({
+    title: v.string(),
+    userId: v.string(),
+    description: v.optional(v.string()),
+    icon: v.optional(v.string()),
+    coverImage: v.optional(v.string()),
+    content: v.optional(v.string()),
+    isPublic: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_public", ["isPublic"]),
 });
