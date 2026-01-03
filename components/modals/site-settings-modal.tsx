@@ -8,17 +8,35 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import { useTemplate } from "@/hooks/useTemplate";
-import { Button } from "@/components/ui/button";
-import { Copy } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
 
 export function SiteSettingsModal() {
   const siteSettings = useSiteSettings();
-  const template = useTemplate();
+  const document = useQuery(
+    api.documents.getById,
+    siteSettings.documentId ? { documentId: siteSettings.documentId } : "skip"
+  );
+  const toggleTemplate = useMutation(api.documents.toggleTemplate);
 
-  const onAllowDuplicate = () => {
-    siteSettings.onClose();
-    template.onOpen();
+  const handleToggleTemplate = async (checked: boolean) => {
+    if (!siteSettings.documentId) return;
+
+    try {
+      await toggleTemplate({
+        id: siteSettings.documentId,
+        isTemplate: checked,
+      });
+      toast.success(
+        checked
+          ? "Document is now available as a template"
+          : "Document removed from templates"
+      );
+    } catch (error) {
+      toast.error("Failed to update template status");
+    }
   };
 
   return (
@@ -38,10 +56,10 @@ export function SiteSettingsModal() {
                 Allow others to use this document as a template
               </p>
             </div>
-            <Button onClick={onAllowDuplicate} size="sm" variant="outline">
-              <Copy className="h-4 w-4 mr-2" />
-              Create Template
-            </Button>
+            <Switch
+              checked={document?.isTemplate ?? false}
+              onCheckedChange={handleToggleTemplate}
+            />
           </div>
         </div>
       </DialogContent>

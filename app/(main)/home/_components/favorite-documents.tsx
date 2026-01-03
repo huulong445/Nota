@@ -1,38 +1,42 @@
-"use client";
-
-import { useState, useRef } from "react";
-import {
-  LayoutTemplateIcon,
-  FileText,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { useQuery, useMutation } from "convex/react";
+import { FileText, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { toast } from "sonner";
 import { useUser } from "@clerk/clerk-react";
+import { toast } from "sonner";
+import { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 
-export const FeaturedTemplate = () => {
-  const templates = useQuery(api.documents.getTemplates);
+export const FavoriteDocuments = () => {
+  const favorites = useQuery(api.documents.getFavorites);
+  const toggleFavorite = useMutation(api.documents.toggleFavorite);
   const router = useRouter();
   const { user } = useUser();
   const [isHovered, setIsHovered] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const CARD_WIDTH = 240;
+  const CARD_WIDTH = 144;
   const GAP = 12;
-  const VISIBLE_CARDS = 2.8;
+  const VISIBLE_CARDS = 4.5;
 
-  const handleTemplateClick = (templateId: string) => {
-    router.push(`/templates/${templateId}`);
+  const handleDocumentClick = (documentId: string) => {
+    router.push(`/documents/${documentId}`);
+  };
+
+  const handleRemoveFavorite = (e: React.MouseEvent, documentId: string) => {
+    e.stopPropagation();
+    const promise = toggleFavorite({ id: documentId as any });
+    toast.promise(promise, {
+      loading: "Removing from favorites...",
+      success: "Removed from favorites",
+      error: "Failed to remove from favorites",
+    });
   };
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollContainerRef.current) return;
-    const scrollAmount = (CARD_WIDTH + GAP) * 2;
+    const scrollAmount = (CARD_WIDTH + GAP) * 4;
     const newScrollLeft =
       direction === "left"
         ? scrollContainerRef.current.scrollLeft - scrollAmount
@@ -49,12 +53,12 @@ export const FeaturedTemplate = () => {
   };
 
   const canScrollRight = () => {
-    if (!scrollContainerRef.current || !templates) return false;
+    if (!scrollContainerRef.current || !favorites) return false;
     const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
     return scrollLeft < scrollWidth - clientWidth - 10;
   };
 
-  if (!templates || templates.length === 0) {
+  if (!favorites || favorites.length === 0) {
     return null;
   }
 
@@ -62,8 +66,8 @@ export const FeaturedTemplate = () => {
     <div className="w-full flex justify-center py-8">
       <div className="w-[60%]">
         <div className="flex items-center gap-2 mb-4">
-          <LayoutTemplateIcon className="h-4 w-4" />
-          <span className="font-medium">Featured templates</span>
+          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+          <span className="font-medium">Favorites</span>
         </div>
         <div
           className="relative group"
@@ -97,7 +101,7 @@ export const FeaturedTemplate = () => {
           </button>
 
           {/* Gradient fade on right */}
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white dark:from-[#1f1f1f] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white dark:from-[#1f1f1f] to-transparent z-10 pointer-events-none" />
 
           {/* Scrollable container */}
           <div
@@ -109,34 +113,45 @@ export const FeaturedTemplate = () => {
               msOverflowStyle: "none",
             }}
           >
-            {templates.map((template) => (
+            {favorites.map((doc) => (
               <div
-                key={template._id}
-                onClick={() => handleTemplateClick(template._id)}
-                className="w-[240px] h-[150px] flex-shrink-0 rounded-lg cursor-pointer hover:shadow-lg transition-all border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col overflow-hidden"
+                key={doc._id}
+                onClick={() => handleDocumentClick(doc._id)}
+                className="w-[144px] h-[144px] flex-shrink-0 rounded-lg cursor-pointer hover:shadow-lg transition-all border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col overflow-hidden group/card relative"
               >
-                <div className="h-[44px] bg-gray-100 dark:bg-gray-900/50 flex items-center px-3">
-                  {template.icon ? (
-                    <span className="text-2xl">{template.icon}</span>
+                {/* Star button to remove from favorites */}
+                <button
+                  onClick={(e) => handleRemoveFavorite(e, doc._id)}
+                  className="absolute top-2 right-2 opacity-0 group-hover/card:opacity-100 transition-opacity z-10 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                  title="Remove from favorites"
+                >
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                </button>
+
+                <div className="h-[44px] bg-yellow-50 dark:bg-yellow-900/20 flex items-center px-3">
+                  {doc.icon ? (
+                    <span className="text-2xl">{doc.icon}</span>
                   ) : (
-                    <LayoutTemplateIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                    <FileText className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   )}
                 </div>
 
                 <div className="flex-1 px-3 pb-3 pt-2 flex flex-col justify-between">
                   <p
                     className="text-sm font-medium line-clamp-2 text-gray-900 dark:text-gray-100"
-                    title={template.title}
+                    title={doc.title}
                   >
-                    {template.title}
+                    {doc.title}
                   </p>
 
                   <div className="flex items-center gap-1.5 mt-auto">
-                    <div className="flex items-center gap-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                      <span className="text-xs text-blue-600 dark:text-blue-400">
-                        By {user?.username}
-                      </span>
-                    </div>
+                    <Avatar className="h-5 w-5">
+                      <AvatarImage src={user?.imageUrl} />
+                      <AvatarFallback className="text-[10px] bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                        {user?.firstName?.[0]}
+                        {user?.lastName?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                 </div>
               </div>

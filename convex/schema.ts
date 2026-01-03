@@ -14,12 +14,16 @@ export default defineSchema({
     isPublished: v.boolean(),
     // _creationTime: v.number(),
     modifiedTime: v.optional(v.number()),
+    isTemplate: v.optional(v.boolean()),
+    isFavorite: v.optional(v.boolean()),
   })
     .index("by_user", ["userId"])
     // .index("by_user_creation", ["userId", "_creationTime"]) // sort theo thời gian tạo
     // .index("by_modified_time", ["modifiedTime"])
     .index("by_user_modified", ["userId", "modifiedTime"]) // sort theo thời gian chỉnh sửa + user
-    .index("by_user_parent", ["userId", "parentDocument"]),
+    .index("by_user_parent", ["userId", "parentDocument"])
+    .index("by_template", ["isTemplate"])
+    .index("by_user_favorite", ["userId", "isFavorite"]),
   templates: defineTable({
     title: v.string(),
     userId: v.string(),

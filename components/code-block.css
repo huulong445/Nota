@@ -1,0 +1,113 @@
+/* Custom syntax highlighting theme for code blocks */
+/* Based on GitHub Dark theme */
+
+.code-block-wrapper .hljs {
+  color: #c9d1d9;
+  background: transparent;
+}
+
+.code-block-wrapper .hljs-comment,
+.code-block-wrapper .hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.code-block-wrapper .hljs-keyword,
+.code-block-wrapper .hljs-selector-tag,
+.code-block-wrapper .hljs-tag {
+  color: #ff7b72;
+}
+
+.code-block-wrapper .hljs-string,
+.code-block-wrapper .hljs-attr,
+.code-block-wrapper .hljs-addition {
+  color: #a5d6ff;
+}
+
+.code-block-wrapper .hljs-template-variable,
+.code-block-wrapper .hljs-variable,
+.code-block-wrapper .hljs-selector-attr {
+  color: #79c0ff;
+}
+
+.code-block-wrapper .hljs-number,
+.code-block-wrapper .hljs-literal {
+  color: #79c0ff;
+}
+
+.code-block-wrapper .hljs-type,
+.code-block-wrapper .hljs-built_in,
+.code-block-wrapper .hljs-class .hljs-title,
+.code-block-wrapper .hljs-title.class_ {
+  color: #ffa657;
+}
+
+.code-block-wrapper .hljs-function,
+.code-block-wrapper .hljs-title.function_ {
+  color: #d2a8ff;
+}
+
+.code-block-wrapper .hljs-params {
+  color: #c9d1d9;
+}
+
+.code-block-wrapper .hljs-attribute,
+.code-block-wrapper .hljs-property {
+  color: #79c0ff;
+}
+
+.code-block-wrapper .hljs-symbol,
+.code-block-wrapper .hljs-bullet {
+  color: #ffa657;
+}
+
+.code-block-wrapper .hljs-meta,
+.code-block-wrapper .hljs-meta .hljs-keyword {
+  color: #a5d6ff;
+}
+
+.code-block-wrapper .hljs-selector-class,
+.code-block-wrapper .hljs-selector-id {
+  color: #7ee787;
+}
+
+.code-block-wrapper .hljs-doctag {
+  color: #ff7b72;
+}
+
+.code-block-wrapper .hljs-regexp {
+  color: #7ee787;
+}
+
+.code-block-wrapper .hljs-deletion {
+  color: #ffa198;
+  background-color: rgba(248, 81, 73, 0.15);
+}
+
+.code-block-wrapper .hljs-section,
+.code-block-wrapper .hljs-name {
+  color: #7ee787;
+}
+
+/* Scrollbar styling for code blocks */
+.code-block-wrapper textarea::-webkit-scrollbar,
+.code-block-wrapper pre::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.code-block-wrapper textarea::-webkit-scrollbar-track,
+.code-block-wrapper pre::-webkit-scrollbar-track {
+  background: #21262d;
+}
+
+.code-block-wrapper textarea::-webkit-scrollbar-thumb,
+.code-block-wrapper pre::-webkit-scrollbar-thumb {
+  background: #484f58;
+  border-radius: 4px;
+}
+
+.code-block-wrapper textarea::-webkit-scrollbar-thumb:hover,
+.code-block-wrapper pre::-webkit-scrollbar-thumb:hover {
+  background: #6e7681;
+}

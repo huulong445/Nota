@@ -1,7 +1,7 @@
 "use client";
 import { Doc } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import React, { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,11 @@ interface TitleProps {
 export const Title = ({ initialData }: TitleProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const update = useMutation(api.documents.update);
+
+  // Fetch the full path of parent documents
+  const documentPath = useQuery(api.documents.getDocumentPath, {
+    documentId: initialData._id,
+  });
 
   const [title, setTitle] = useState(initialData.title || "Untitiled");
   const [isEditing, setIsEditing] = useState(false);
@@ -64,7 +69,32 @@ export const Title = ({ initialData }: TitleProps) => {
           size="sm"
           className="font-normal h-auto p-1"
         >
-          <span className="truncate">{initialData?.title}</span>
+          <span className="truncate">
+            {initialData.isTemplate ? (
+              <>
+                <span className="text-muted-foreground">Templates</span>
+                <span className="mx-1">/</span>
+                {initialData?.title}
+              </>
+            ) : (
+              <>
+                {documentPath && documentPath.length > 0 && (
+                  <>
+                    {documentPath.map((doc, index) => (
+                      <React.Fragment key={doc.id}>
+                        {doc.icon && <span className="mr-1">{doc.icon}</span>}
+                        {doc.title}
+                        {index < documentPath.length && (
+                          <span className="mx-1">/</span>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </>
+                )}
+                {initialData?.title}
+              </>
+            )}
+          </span>
         </Button>
       )}
     </div>

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { DisplayDocument } from "./_components/display-document";
 import { FeaturedTemplate } from "./_components/featured-template";
+import { FavoriteDocuments } from "./_components/favorite-documents";
+
 export default function HomePage() {
   const [greeting, SetGreeting] = useState("");
   useEffect(() => {
@@ -29,6 +31,7 @@ export default function HomePage() {
           Good {greeting}
         </div>
       </div>
+      <FavoriteDocuments />
       <DisplayDocument />
       <FeaturedTemplate />
     </div>
