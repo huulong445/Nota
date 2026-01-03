@@ -54,6 +54,7 @@ function extractTextFromContent(content: string | undefined): string {
         // Handle table content (content is an object with tableContent type)
         if (
           item.content &&
+          !Array.isArray(item.content) &&
           item.content.type === "tableContent" &&
           item.content.rows
         ) {
