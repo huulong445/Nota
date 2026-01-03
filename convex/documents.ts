@@ -309,7 +309,7 @@ export const getSearch = query({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new Error("Not authenticated");
+      return [];
     }
     const userId = identity.subject;
     const documents = await ctx.db
