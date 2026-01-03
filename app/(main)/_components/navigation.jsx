@@ -8,7 +8,6 @@ import {
   PlusCircle,
   Search,
   Settings,
-  Trash,
   Trash2,
 } from "lucide-react";
 
@@ -18,13 +17,12 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { ElementRef, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { useSearch } from "@/hooks/useSearch";
 import { useSettings } from "@/hooks/useSettings";
 
 import { cn } from "@/lib/utils";
-import path from "path";
 
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -81,17 +79,29 @@ export default function Navigation() {
     [isMobile]
   );
 
+  // Initial setup based on isMobile - use useLayoutEffect pattern
+  const initialSetupDone = useRef(false);
+
   useEffect(() => {
-    if (isMobile) {
-      resetWidth(0);
-    } else {
-      resetWidth(240);
-    }
+    if (initialSetupDone.current) return;
+    initialSetupDone.current = true;
+
+    // Schedule the initial width setting for the next frame
+    requestAnimationFrame(() => {
+      if (isMobile) {
+        resetWidth(0);
+      } else {
+        resetWidth(240);
+      }
+    });
   }, [isMobile, resetWidth]);
 
   useEffect(() => {
     if (isMobile) {
-      resetWidth(0);
+      // Schedule for next frame to avoid sync setState in effect
+      requestAnimationFrame(() => {
+        resetWidth(0);
+      });
     }
   }, [pathName, isMobile, resetWidth]);
 

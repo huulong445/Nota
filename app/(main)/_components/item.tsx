@@ -8,7 +8,6 @@ import {
   MoreHorizontal,
   Plus,
   Trash2,
-  Move,
   MoveRight,
   Star,
 } from "lucide-react";
@@ -17,7 +16,6 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -57,7 +55,6 @@ const Item = ({
   isFavorite,
 }: ItemProps) => {
   const { user } = useUser();
-  const router = useRouter();
   const create = useMutation(api.documents.create);
   const archive = useMutation(api.documents.archive);
   const moveDocument = useMutation(api.documents.moveDocument);

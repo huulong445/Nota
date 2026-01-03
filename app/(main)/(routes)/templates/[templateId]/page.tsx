@@ -3,11 +3,9 @@ import { use } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { Cover } from "@/components/cover";
-import { Toolbar } from "@/components/toolbar";
 import { Editor } from "@/components/editor";
 import { Button } from "@/components/ui/button";
-import { FileText, ExternalLink, Plus } from "lucide-react";
+import { ExternalLink, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,7 +33,7 @@ export default function TemplatePage({ params }: TemplatePageProps) {
       });
       toast.success("Document created from template!");
       router.push(`/documents/${documentId}`);
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to create document from template");
     }
   };

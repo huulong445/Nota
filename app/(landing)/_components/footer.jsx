@@ -1,4 +1,3 @@
-import Logo from "./logo";
 import Sponsor from "./sponsor";
 import { Button } from "@/components/ui/button";
 export default function Footer() {

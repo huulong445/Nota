@@ -11,7 +11,6 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface Template {
@@ -36,7 +35,7 @@ export function TemplateModal() {
       toast.success("Document created from template!");
       router.push(`/documents/${documentId}`);
       template.onClose();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to create document from template");
     }
   };

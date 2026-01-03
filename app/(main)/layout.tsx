@@ -1,7 +1,6 @@
 "use client";
 
 import { useConvexAuth } from "convex/react";
-import { useConvex } from "convex/react";
 import { redirect } from "next/navigation";
 
 import Navigation from "./_components/navigation";

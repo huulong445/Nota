@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 import Item from "./item";
-import { FileIcon, FileText, UndoIcon } from "lucide-react";
+import { FileIcon, FileText } from "lucide-react";
 
 interface DocumentListProps {
   parentDocumentId?: Id<"documents">;
@@ -54,7 +54,8 @@ export default function DocumentList({
           if (block.content) {
             return Array.isArray(block.content)
               ? block.content.some(
-                  (item: any) => item.text && item.text.trim().length > 0
+                  (item: { text?: string }) =>
+                    item.text && item.text.trim().length > 0
                 )
               : false;
           }

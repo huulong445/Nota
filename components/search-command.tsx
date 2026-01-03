@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useSyncExternalStore } from "react";
 import { File, FileText } from "lucide-react";
 import { useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -17,14 +17,28 @@ import {
 import { useSearch } from "@/hooks/useSearch";
 import { api } from "@/convex/_generated/api";
 
+// SSR-safe way to check if mounted
+const emptySubscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 // Helper function to extract plain text from BlockNote JSON content
+interface BlockItem {
+  type?: string;
+  text?: string;
+  content?:
+    | BlockItem[]
+    | { type: string; rows?: { cells?: { content?: BlockItem[] }[] }[] };
+  children?: BlockItem[];
+}
+
 function extractTextFromContent(content: string | undefined): string {
   if (!content) return "";
 
   try {
     const blocks = JSON.parse(content);
 
-    const extractText = (items: any[]): string => {
+    const extractText = (items: BlockItem[]): string => {
       let text = "";
 
       for (const item of items) {
@@ -78,7 +92,11 @@ export function SearchCommand() {
   const { user } = useUser();
   const router = useRouter();
   const documents = useQuery(api.documents.getSearch);
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   const toggle = useSearch((store) => store.toggle);
@@ -137,9 +155,6 @@ export function SearchCommand() {
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, [toggle]);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   if (!isMounted) {
     return null;

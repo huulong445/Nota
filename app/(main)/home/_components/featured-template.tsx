@@ -1,17 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
-import {
-  LayoutTemplateIcon,
-  FileText,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { LayoutTemplateIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { api } from "@/convex/_generated/api";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { toast } from "sonner";
 import { useUser } from "@clerk/clerk-react";
 import { cn } from "@/lib/utils";
 
@@ -21,10 +14,28 @@ export const FeaturedTemplate = () => {
   const { user } = useUser();
   const [isHovered, setIsHovered] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeftState, setCanScrollLeftState] = useState(false);
+  const [canScrollRightState, setCanScrollRightState] = useState(false);
 
   const CARD_WIDTH = 240;
   const GAP = 12;
   const VISIBLE_CARDS = 2.8;
+
+  const updateScrollState = useCallback(() => {
+    if (!scrollContainerRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+    setCanScrollLeftState(scrollLeft > 0);
+    setCanScrollRightState(scrollLeft < scrollWidth - clientWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    updateScrollState();
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", updateScrollState);
+      return () => container.removeEventListener("scroll", updateScrollState);
+    }
+  }, [templates, updateScrollState]);
 
   const handleTemplateClick = (templateId: string) => {
     router.push(`/templates/${templateId}`);
@@ -41,17 +52,6 @@ export const FeaturedTemplate = () => {
       left: newScrollLeft,
       behavior: "smooth",
     });
-  };
-
-  const canScrollLeft = () => {
-    if (!scrollContainerRef.current) return false;
-    return scrollContainerRef.current.scrollLeft > 0;
-  };
-
-  const canScrollRight = () => {
-    if (!scrollContainerRef.current || !templates) return false;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-    return scrollLeft < scrollWidth - clientWidth - 10;
   };
 
   if (!templates || templates.length === 0) {
@@ -75,7 +75,7 @@ export const FeaturedTemplate = () => {
             onClick={() => scroll("left")}
             className={cn(
               "absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 shadow-lg rounded-full p-2 transition-opacity duration-200",
-              isHovered && canScrollLeft()
+              isHovered && canScrollLeftState
                 ? "opacity-100"
                 : "opacity-0 pointer-events-none"
             )}
@@ -88,7 +88,7 @@ export const FeaturedTemplate = () => {
             onClick={() => scroll("right")}
             className={cn(
               "absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 shadow-lg rounded-full p-2 transition-opacity duration-200",
-              isHovered && canScrollRight()
+              isHovered && canScrollRightState
                 ? "opacity-100"
                 : "opacity-0 pointer-events-none"
             )}

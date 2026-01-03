@@ -9,7 +9,7 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 // import { title } from "process";
 export default function DocumentPage() {
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { user } = useUser();
   const create = useMutation(api.documents.create);
   // console.log("User data:", { user, isLoaded, isSignedIn });
   const onCreate = () => {

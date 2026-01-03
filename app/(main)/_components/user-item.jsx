@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
@@ -14,7 +13,7 @@ import {
 import { SignOutButton, useUser } from "@clerk/clerk-react";
 
 export default function UserItem() {
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { user } = useUser();
   // console.log(user?.username);
   // console.log(user?.firstName);
   // console.log(user?.fullName);

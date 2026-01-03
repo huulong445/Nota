@@ -6,8 +6,6 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Toolbar } from "@/components/toolbar";
 import { Editor } from "@/components/editor";
 import { Cover } from "@/components/cover";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import Logo from "@/app/(landing)/_components/logo";
 interface DocumentIdPageProps {
   params: Promise<{
@@ -16,7 +14,6 @@ interface DocumentIdPageProps {
 }
 
 export default function DocumentIdPage({ params }: DocumentIdPageProps) {
-  const router = useRouter();
   const { documentId } = use(params);
   const update = useMutation(api.documents.update);
   const onChange = (content: string) => {

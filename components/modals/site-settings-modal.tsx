@@ -34,7 +34,7 @@ export function SiteSettingsModal() {
           ? "Document is now available as a template"
           : "Document removed from templates"
       );
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update template status");
     }
   };

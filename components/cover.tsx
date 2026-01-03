@@ -9,8 +9,6 @@ import { api } from "@/convex/_generated/api";
 import { useParams } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
 import { useEdgeStore } from "@/lib/edgestore";
-import { toast } from "sonner";
-import { ur } from "zod/v4/locales";
 
 interface CoverImageProps {
   url?: string;

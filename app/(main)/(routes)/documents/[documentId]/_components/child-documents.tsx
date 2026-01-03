@@ -26,7 +26,8 @@ export const ChildDocuments = ({ documentId }: ChildDocumentsProps) => {
           if (block.content) {
             return Array.isArray(block.content)
               ? block.content.some(
-                  (item: any) => item.text && item.text.trim().length > 0
+                  (item: { text?: string }) =>
+                    item.text && item.text.trim().length > 0
                 )
               : false;
           }

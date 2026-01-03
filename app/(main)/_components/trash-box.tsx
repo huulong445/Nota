@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Id } from "@/convex/_generated/dataModel";
 import { toast } from "sonner";
 import { Spinner } from "@/components/spinner";
-import { Search, Trash, Trash2, Undo } from "lucide-react";
+import { Search, Trash2, Undo } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ConfirmModal } from "@/components/modals/confirm-modal";
 export function TrashBox() {

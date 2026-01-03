@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useSyncExternalStore } from "react";
 import { File, FolderInput } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { useUser } from "@clerk/clerk-react";
@@ -16,12 +16,22 @@ import {
 } from "@/components/ui/command";
 import { useMove } from "@/hooks/useMove";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+
+// SSR-safe way to check if mounted
+const emptySubscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 export function MoveCommand() {
   const { user } = useUser();
   const documents = useQuery(api.documents.getSearch);
   const moveDocument = useMutation(api.documents.moveDocument);
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   const isOpen = useMove((store) => store.isOpen);
@@ -52,7 +62,7 @@ export function MoveCommand() {
 
     const promise = moveDocument({
       id: documentId,
-      parentDocument: targetId as any,
+      parentDocument: targetId as Id<"documents"> | undefined,
     });
 
     toast.promise(promise, {
@@ -71,10 +81,6 @@ export function MoveCommand() {
       onClose();
     }
   };
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   if (!isMounted) {
     return null;

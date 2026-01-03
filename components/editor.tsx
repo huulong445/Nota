@@ -65,7 +65,6 @@ export const Editor = ({ onChange, initialContent, editable }: EditorProps) => {
             range.setStart(node, index);
             range.setEnd(node, index + searchHighlight.length);
 
-            const rect = range.getBoundingClientRect();
             const element = node.parentElement;
 
             if (element) {

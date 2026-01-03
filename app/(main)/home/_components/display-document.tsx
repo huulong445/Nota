@@ -4,7 +4,7 @@ import { Clock, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@clerk/clerk-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 
 export const DisplayDocument = () => {
@@ -13,16 +13,39 @@ export const DisplayDocument = () => {
   const { user } = useUser();
   const [isHovered, setIsHovered] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeftState, setCanScrollLeftState] = useState(false);
+  const [canScrollRightState, setCanScrollRightState] = useState(false);
+  const [currentTime, setCurrentTime] = useState<number | null>(null);
 
   const CARD_WIDTH = 144;
   const GAP = 12;
   const VISIBLE_CARDS = 4.5;
 
-  const getTimeAgo = (modifiedTime?: number) => {
-    if (!modifiedTime) return "Unknown";
+  // Set current time on client side only
+  useEffect(() => {
+    setCurrentTime(Date.now());
+  }, []);
 
-    const now = Date.now();
-    const diff = now - modifiedTime;
+  const updateScrollState = useCallback(() => {
+    if (!scrollContainerRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+    setCanScrollLeftState(scrollLeft > 0);
+    setCanScrollRightState(scrollLeft < scrollWidth - clientWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    updateScrollState();
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", updateScrollState);
+      return () => container.removeEventListener("scroll", updateScrollState);
+    }
+  }, [documents, updateScrollState]);
+
+  const getTimeAgo = (modifiedTime?: number) => {
+    if (!modifiedTime || !currentTime) return "Unknown";
+
+    const diff = currentTime - modifiedTime;
 
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
@@ -52,17 +75,6 @@ export const DisplayDocument = () => {
     });
   };
 
-  const canScrollLeft = () => {
-    if (!scrollContainerRef.current) return false;
-    return scrollContainerRef.current.scrollLeft > 0;
-  };
-
-  const canScrollRight = () => {
-    if (!scrollContainerRef.current || !documents) return false;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-    return scrollLeft < scrollWidth - clientWidth - 10;
-  };
-
   return (
     <div className="w-full flex justify-center py-8">
       <div className="w-[60%]">
@@ -80,7 +92,7 @@ export const DisplayDocument = () => {
             onClick={() => scroll("left")}
             className={cn(
               "absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 shadow-lg rounded-full p-2 transition-opacity duration-200",
-              isHovered && canScrollLeft()
+              isHovered && canScrollLeftState
                 ? "opacity-100"
                 : "opacity-0 pointer-events-none"
             )}
@@ -93,7 +105,7 @@ export const DisplayDocument = () => {
             onClick={() => scroll("right")}
             className={cn(
               "absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 shadow-lg rounded-full p-2 transition-opacity duration-200",
-              isHovered && canScrollRight()
+              isHovered && canScrollRightState
                 ? "opacity-100"
                 : "opacity-0 pointer-events-none"
             )}

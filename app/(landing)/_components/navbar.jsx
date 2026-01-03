@@ -8,9 +8,9 @@ import { Spinner } from "@/components/spinner";
 import { cn } from "@/lib/utils";
 import { useConvexAuth } from "convex/react";
 import { SignInButton, UserButton, useUser } from "@clerk/clerk-react";
-import Link from "next/link";
+
 export default function Navbar() {
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { user } = useUser();
   const scrolled = UseScrollTop();
   const { isAuthenticated, isLoading } = useConvexAuth();
   return (
