@@ -6,6 +6,7 @@ export default defineSchema({
   documents: defineTable({
     title: v.string(),
     userId: v.string(),
+    authorName: v.optional(v.string()), // Tên tác giả gốc của template
     isArchived: v.boolean(),
     parentDocument: v.optional(v.id("documents")),
     content: v.optional(v.string()),
@@ -36,4 +37,16 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_public", ["isPublic"]),
+  // Bảng lưu comments và ratings cho templates
+  templateReviews: defineTable({
+    templateId: v.id("documents"),
+    userId: v.string(),
+    userName: v.string(),
+    userImage: v.optional(v.string()),
+    rating: v.number(), // 1-5 stars
+    comment: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_template", ["templateId"])
+    .index("by_user_template", ["userId", "templateId"]),
 });

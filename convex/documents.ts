@@ -494,8 +494,14 @@ export const toggleTemplate = mutation({
       throw new Error("Unauthorized");
     }
 
+    // Lưu tên tác giả khi đánh dấu là template
+    const authorName = args.isTemplate
+      ? identity.name || identity.nickname || "Unknown"
+      : undefined;
+
     const document = await ctx.db.patch(args.id, {
       isTemplate: args.isTemplate,
+      authorName: authorName,
       modifiedTime: Date.now(),
     });
 
@@ -585,5 +591,167 @@ export const createFromTemplate = mutation({
     const documentId = await copyDocumentWithChildren(args.templateId);
 
     return documentId;
+  },
+});
+
+// Thêm review cho template
+export const addTemplateReview = mutation({
+  args: {
+    templateId: v.id("documents"),
+    rating: v.number(),
+    comment: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const template = await ctx.db.get(args.templateId);
+    if (!template || !template.isTemplate) {
+      throw new Error("Template not found");
+    }
+
+    // Kiểm tra rating hợp lệ (1-5)
+    if (args.rating < 1 || args.rating > 5) {
+      throw new Error("Rating must be between 1 and 5");
+    }
+
+    const userId = identity.subject;
+
+    // Kiểm tra xem user đã review chưa
+    const existingReview = await ctx.db
+      .query("templateReviews")
+      .withIndex("by_user_template", (q) =>
+        q.eq("userId", userId).eq("templateId", args.templateId)
+      )
+      .first();
+
+    if (existingReview) {
+      // Cập nhật review hiện có
+      const review = await ctx.db.patch(existingReview._id, {
+        rating: args.rating,
+        comment: args.comment,
+        createdAt: Date.now(),
+      });
+      return review;
+    }
+
+    // Tạo review mới
+    const review = await ctx.db.insert("templateReviews", {
+      templateId: args.templateId,
+      userId,
+      userName: identity.name || identity.nickname || "Anonymous",
+      userImage: identity.pictureUrl,
+      rating: args.rating,
+      comment: args.comment,
+      createdAt: Date.now(),
+    });
+
+    return review;
+  },
+});
+
+// Lấy reviews của template
+export const getTemplateReviews = query({
+  args: {
+    templateId: v.id("documents"),
+  },
+  handler: async (ctx, args) => {
+    const reviews = await ctx.db
+      .query("templateReviews")
+      .withIndex("by_template", (q) => q.eq("templateId", args.templateId))
+      .order("desc")
+      .collect();
+
+    return reviews;
+  },
+});
+
+// Lấy rating trung bình của template
+export const getTemplateRating = query({
+  args: {
+    templateId: v.id("documents"),
+  },
+  handler: async (ctx, args) => {
+    const reviews = await ctx.db
+      .query("templateReviews")
+      .withIndex("by_template", (q) => q.eq("templateId", args.templateId))
+      .collect();
+
+    if (reviews.length === 0) {
+      return { averageRating: 0, totalReviews: 0 };
+    }
+
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = totalRating / reviews.length;
+
+    return {
+      averageRating: Math.round(averageRating * 10) / 10, // Làm tròn 1 chữ số
+      totalReviews: reviews.length,
+    };
+  },
+});
+
+// Xóa review
+export const deleteTemplateReview = mutation({
+  args: {
+    reviewId: v.id("templateReviews"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const review = await ctx.db.get(args.reviewId);
+    if (!review) {
+      throw new Error("Review not found");
+    }
+
+    if (review.userId !== identity.subject) {
+      throw new Error("Unauthorized");
+    }
+
+    await ctx.db.delete(args.reviewId);
+    return true;
+  },
+});
+
+// Xóa template (chỉ tác giả mới có thể xóa)
+export const deleteTemplate = mutation({
+  args: {
+    templateId: v.id("documents"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const template = await ctx.db.get(args.templateId);
+    if (!template) {
+      throw new Error("Template not found");
+    }
+
+    if (template.userId !== identity.subject) {
+      throw new Error(
+        "Unauthorized - Only the author can delete this template"
+      );
+    }
+
+    // Xóa tất cả reviews của template
+    const reviews = await ctx.db
+      .query("templateReviews")
+      .withIndex("by_template", (q) => q.eq("templateId", args.templateId))
+      .collect();
+
+    for (const review of reviews) {
+      await ctx.db.delete(review._id);
+    }
+
+    // Xóa template
+    await ctx.db.delete(args.templateId);
+    return true;
   },
 });

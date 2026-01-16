@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { LayoutTemplateIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  LayoutTemplateIcon,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+} from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/clerk-react";
 import { cn } from "@/lib/utils";
+import { Id } from "@/convex/_generated/dataModel";
 
 export const FeaturedTemplate = () => {
   const templates = useQuery(api.documents.getTemplates);
   const router = useRouter();
-  const { user } = useUser();
   const [isHovered, setIsHovered] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeftState, setCanScrollLeftState] = useState(false);
@@ -110,38 +114,71 @@ export const FeaturedTemplate = () => {
             }}
           >
             {templates.map((template) => (
-              <div
+              <TemplateCard
                 key={template._id}
+                template={template}
                 onClick={() => handleTemplateClick(template._id)}
-                className="w-[240px] h-[150px] flex-shrink-0 rounded-lg cursor-pointer hover:shadow-lg transition-all border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col overflow-hidden"
-              >
-                <div className="h-[44px] bg-gray-100 dark:bg-gray-900/50 flex items-center px-3">
-                  {template.icon ? (
-                    <span className="text-2xl">{template.icon}</span>
-                  ) : (
-                    <LayoutTemplateIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                  )}
-                </div>
-
-                <div className="flex-1 px-3 pb-3 pt-2 flex flex-col justify-between">
-                  <p
-                    className="text-sm font-medium line-clamp-2 text-gray-900 dark:text-gray-100"
-                    title={template.title}
-                  >
-                    {template.title}
-                  </p>
-
-                  <div className="flex items-center gap-1.5 mt-auto">
-                    <div className="flex items-center gap-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                      <span className="text-xs text-blue-600 dark:text-blue-400">
-                        By {user?.username}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              />
             ))}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Component riêng cho template card để fetch rating
+const TemplateCard = ({
+  template,
+  onClick,
+}: {
+  template: {
+    _id: Id<"documents">;
+    title: string;
+    icon?: string;
+    authorName?: string;
+  };
+  onClick: () => void;
+}) => {
+  const rating = useQuery(api.documents.getTemplateRating, {
+    templateId: template._id,
+  });
+
+  return (
+    <div
+      onClick={onClick}
+      className="w-[240px] h-[150px] flex-shrink-0 rounded-lg cursor-pointer hover:shadow-lg transition-all border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col overflow-hidden"
+    >
+      <div className="h-[44px] bg-gray-100 dark:bg-gray-900/50 flex items-center px-3">
+        {template.icon ? (
+          <span className="text-2xl">{template.icon}</span>
+        ) : (
+          <LayoutTemplateIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+        )}
+      </div>
+
+      <div className="flex-1 px-3 pb-3 pt-2 flex flex-col justify-between">
+        <p
+          className="text-sm font-medium line-clamp-2 text-gray-900 dark:text-gray-100"
+          title={template.title}
+        >
+          {template.title}
+        </p>
+
+        <div className="flex items-center justify-between mt-auto">
+          <div className="flex items-center gap-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+            <span className="text-xs text-blue-600 dark:text-blue-400">
+              By {template.authorName || "Unknown"}
+            </span>
+          </div>
+          {rating && rating.totalReviews > 0 && (
+            <div className="flex items-center gap-1">
+              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+              <span className="text-xs text-muted-foreground">
+                {rating.averageRating}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>
