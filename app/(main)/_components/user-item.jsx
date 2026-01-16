@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronsLeftRight } from "lucide-react";
+import { ChevronsLeftRight, User } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { SignOutButton, useUser } from "@clerk/clerk-react";
+import { useRouter } from "next/navigation";
 
 export default function UserItem() {
   const { user } = useUser();
+  const router = useRouter();
   // console.log(user?.username);
   // console.log(user?.firstName);
   // console.log(user?.fullName);
@@ -60,6 +62,13 @@ export default function UserItem() {
         </div>
 
         <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => router.push("/profile")}
+          className="cursor-pointer"
+        >
+          <User className="h-4 w-4 mr-2" />
+          Profile
+        </DropdownMenuItem>
         <DropdownMenuItem
           asChild
           className="w-full cursor-pointer text-muted-foreground"

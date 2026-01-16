@@ -59,7 +59,25 @@ export const FeaturedTemplate = () => {
   };
 
   if (!templates || templates.length === 0) {
-    return null;
+    return (
+      <div className="w-full flex justify-center py-8">
+        <div className="w-[60%]">
+          <div className="flex items-center gap-2 mb-4">
+            <LayoutTemplateIcon className="h-4 w-4" />
+            <span className="font-medium">Featured templates</span>
+          </div>
+          <div className="flex flex-col items-center justify-center py-12 px-6 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/30">
+            <LayoutTemplateIcon className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-3" />
+            <p className="text-sm text-muted-foreground text-center">
+              No templates available yet
+            </p>
+            <p className="text-xs text-muted-foreground/70 text-center mt-1">
+              Create and publish a template to share with others
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -67,7 +67,25 @@ export const FavoriteDocuments = () => {
   };
 
   if (!favorites || favorites.length === 0) {
-    return null;
+    return (
+      <div className="w-full flex justify-center py-8">
+        <div className="w-[60%]">
+          <div className="flex items-center gap-2 mb-4">
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span className="font-medium">Favorites</span>
+          </div>
+          <div className="flex flex-col items-center justify-center py-12 px-6 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/30">
+            <Star className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-3" />
+            <p className="text-sm text-muted-foreground text-center">
+              Add your favorite documents here for easier access
+            </p>
+            <p className="text-xs text-muted-foreground/70 text-center mt-1">
+              Click the star icon on any document to add it to favorites
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
