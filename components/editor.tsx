@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react";
@@ -80,7 +80,7 @@ export const Editor = ({ onChange, initialContent, editable }: EditorProps) => {
 
               range.surroundContents(mark);
 
-              // Remove highlight after 3 seconds
+              // Remove highlight after x seconds
               setTimeout(() => {
                 const parent = mark.parentNode;
                 if (parent) {
@@ -104,15 +104,26 @@ export const Editor = ({ onChange, initialContent, editable }: EditorProps) => {
     scrollToMatch();
   }, [searchHighlight, editor, clearSearchHighlight, resolvedTheme]);
 
+  const handleEditorChange = useCallback(() => {
+    try {
+      // Check if editor and document are still valid before accessing
+      if (editor && editor.document) {
+        onChange(JSON.stringify(editor.document, null, 2));
+      }
+    } catch (error) {
+      // Silently handle the error when blocks are deleted via keyboard
+      // prevents crashes when deleting tables or other complex blocks
+      console.warn("Editor change handler caught an error:", error);
+    }
+  }, [editor, onChange]);
+
   return (
     <div>
       <BlockNoteView
         editor={editor}
         theme={resolvedTheme === "dark" ? "dark" : "light"}
         editable={editable}
-        onChange={() => {
-          onChange(JSON.stringify(editor.document, null, 2));
-        }}
+        onChange={handleEditorChange}
       />
     </div>
   );

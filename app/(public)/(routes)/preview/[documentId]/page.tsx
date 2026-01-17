@@ -56,7 +56,7 @@ export default function DocumentIdPage({ params }: DocumentIdPageProps) {
   }
 
   return (
-    <div className="pb-40 h-screen w-full">
+    <div className="pb-40 min-h-screen w-full dark:bg-[#1f1f1f]">
       <Cover preview url={document.coverImage} />
       <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
         <Toolbar preview initialData={document} />

@@ -6,7 +6,7 @@ export default defineSchema({
   documents: defineTable({
     title: v.string(),
     userId: v.string(),
-    authorName: v.optional(v.string()), // Tên tác giả gốc của template
+    authorName: v.optional(v.string()), // tác giả gốc của template
     isArchived: v.boolean(),
     parentDocument: v.optional(v.id("documents")),
     content: v.optional(v.string()),
